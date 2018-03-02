@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
 	"log"
 	"net"
@@ -12,6 +13,8 @@ import (
 )
 
 func main() {
+	verb := flag.Bool("v", false, "Verbose")
+	flag.Parse()
 	host := os.Getenv("A_HOST")
 	if host == "" {
 		log.Fatal("ENV var A_HOST need suppliend")
@@ -27,15 +30,21 @@ func main() {
 		log.Fatal(err)
 	}
 	extIP := strings.TrimSpace(string(body))
-	log.Println("My external IP", extIP)
+	if *verb {
+		log.Println("My external IP", extIP)
+	}
 	ips, err := net.LookupIP(host)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(ips)
+	if *verb {
+		log.Println(ips)
+	}
 	dnsIP := strings.TrimSpace(ips[0].String())
 	if dnsIP == extIP {
-		log.Println("IPs not cahnged")
+		if *verb {
+			log.Println("IPs not cahnged")
+		}
 		os.Exit(0)
 	}
 	// CloudFlare API
