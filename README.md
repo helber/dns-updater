@@ -9,6 +9,7 @@ To run you need export some variables:
 `A_HOST`: Is o host name of "A" record
 `CF_API_KEY`: cloudflare API key
 `CF_API_EMAIL`: cloudflare e-mail user ("login")
+`HOST_IP_GET`: hosts to get external ip (default=http://ifconfig.io/ip;http://ifconfig.co/ip)
 
 You awso need a valid domain that you can handle.
 

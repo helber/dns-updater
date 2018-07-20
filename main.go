@@ -20,18 +20,40 @@ func main() {
 		log.Fatal("ENV var A_HOST need suppliend")
 	}
 	// get external ip addr
-	resp, err := http.Get("http://ifconfig.io/ip")
-	if err != nil {
-		log.Fatal(err)
+	externalIP := os.Getenv("HOST_IP_GET")
+	if externalIP == "" {
+		externalIP = "http://ifconfig.io/ip;http://ifconfig.co/ip"
 	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
+	extIP := ""
+	sites := strings.Split(externalIP, ";")
+	for _, site := range sites {
+		if *verb {
+			log.Println("Call -> ", site)
+		}
+		resp, err := http.Get(site)
+		if err != nil {
+			continue
+		}
+		body, err := ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		rextIP := strings.TrimSpace(string(body))
+		trial := net.ParseIP(rextIP).To4()
+		if trial == nil {
+			if *verb {
+				log.Println("invalid IP")
+			}
+			continue
+		}
+		extIP = rextIP
+		if *verb {
+			log.Println("My external IP", extIP)
+		}
 	}
-	extIP := strings.TrimSpace(string(body))
-	if *verb {
-		log.Println("My external IP", extIP)
+	if extIP == "" {
+		log.Fatal("Can not determine external IP address")
 	}
 	ips, err := net.LookupIP(host)
 	if err != nil {
